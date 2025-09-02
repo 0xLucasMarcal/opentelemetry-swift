@@ -5,37 +5,25 @@
 
 import Foundation
 
-public class DefaultLogger: Logger {
-  private static let instanceWithDomain = DefaultLogger(true)
-  private static let instanceNoDomain = DefaultLogger(false)
-  private static let noopLogRecordBuilder = NoopLogRecordBuilder()
+public final class DefaultLogger: Logger {
+  private let hasDomain: Bool
 
-  private var hasDomain: Bool
-
-  private init(_ hasDomain: Bool) {
+  public init(hasDomain: Bool) {
     self.hasDomain = hasDomain
-  }
-
-  static func getInstance(_ hasDomain: Bool) -> Logger {
-    if hasDomain {
-      return instanceWithDomain
-    } else {
-      return instanceNoDomain
-    }
   }
 
   public func eventBuilder(name: String) -> EventBuilder {
     if !hasDomain {
       /// log error
     }
-    return Self.noopLogRecordBuilder
+    return NoopLogRecordBuilder()
   }
 
   public func logRecordBuilder() -> LogRecordBuilder {
-    return Self.noopLogRecordBuilder
+    return NoopLogRecordBuilder()
   }
 
-  private class NoopLogRecordBuilder: EventBuilder {
+  private final class NoopLogRecordBuilder: EventBuilder {
     func setTimestamp(_ timestamp: Date) -> Self {
       return self
     }

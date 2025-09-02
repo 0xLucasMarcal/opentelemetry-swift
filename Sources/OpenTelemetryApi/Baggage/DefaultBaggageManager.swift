@@ -6,12 +6,13 @@
 import Foundation
 
 /// No-op implementations of BaggageManager.
-public class DefaultBaggageManager: BaggageManager {
-  private init() {}
+public final class DefaultBaggageManager: BaggageManager {
+  public init() {}
 
   ///  Returns a BaggageManager singleton that is the default implementation for
   ///  BaggageManager.
-  public static var instance = DefaultBaggageManager()
+  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
+  public static let instance = DefaultBaggageManager()
 
   public func baggageBuilder() -> BaggageBuilder {
     return DefaultBaggageBuilder()

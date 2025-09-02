@@ -5,8 +5,11 @@
 
 import Foundation
 
-public class DefaultTracerProvider: TracerProvider {
+public final class DefaultTracerProvider: TracerProvider {
+  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
   public static let instance = DefaultTracerProvider()
+
+  public init() {}
 
   public func get(instrumentationName: String,
                   instrumentationVersion: String? = nil,

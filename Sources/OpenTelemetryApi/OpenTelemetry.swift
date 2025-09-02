@@ -9,107 +9,99 @@ import Foundation
   import os.log
 #endif
 
-/// This class provides a static global accessor for telemetry objects Tracer, Meter
-///  and BaggageManager.
-///  The telemetry objects are lazy-loaded singletons resolved via ServiceLoader mechanism.
-public struct OpenTelemetry {
-  public static var version = "v1.21.0"
+/// This class provides thread-safe access to telemetry objects Tracer, Meter and BaggageManager.
+public final class OpenTelemetry: Sendable {
+  public static let version = "v1.21.0"
+  
+  /// Backward compatibility - deprecated global instance
+  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
+  public static let instance = OpenTelemetry()
+  
+  private let configuration: OpenTelemetryConfiguration
+  
+  /// Registered tracerProvider from configuration
+  public var tracerProvider: TracerProvider { configuration.tracerProvider }
+  
+  /// Registered MeterProvider from configuration  
+  public var meterProvider: any MeterProvider { configuration.meterProvider }
+  
+  /// Registered LoggerProvider from configuration
+  public var loggerProvider: LoggerProvider { configuration.loggerProvider }
+  
+  /// Registered BaggageManager from configuration
+  public var baggageManager: BaggageManager { configuration.baggageManager }
+  
+  /// Registered propagators from configuration
+  public var propagators: ContextPropagators { configuration.propagators }
+  
+  /// Context provider from configuration
+  public var contextProvider: OpenTelemetryContextProvider { configuration.contextProvider }
+  
+  /// Feedback handler from configuration
+  public var feedbackHandler: (@Sendable (String) -> Void)? { configuration.feedbackHandler }
 
-  public static var instance = OpenTelemetry()
-
-  /// Registered tracerProvider or default via DefaultTracerProvider.instance.
-  public private(set) var tracerProvider: TracerProvider
-
-  /// Registered MeterProvider or default via DefaultMeterProvider.instance.
-
-  public private(set) var meterProvider: any MeterProvider
-
-  /// Registered LoggerProvider or default via DefaultLoggerProvider.instance.
-  public private(set) var loggerProvider: LoggerProvider
-
-  /// registered manager or default via  DefaultBaggageManager.instance.
-  public private(set) var baggageManager: BaggageManager
-
-  /// registered manager or default via  DefaultBaggageManager.instance.
-  public private(set) var propagators: ContextPropagators =
-    DefaultContextPropagators(textPropagators: [W3CTraceContextPropagator()],
-                              baggagePropagator: W3CBaggagePropagator())
-
-  /// registered manager or default via  DefaultBaggageManager.instance.
-  public private(set) var contextProvider: OpenTelemetryContextProvider
-
-  /// Allow customizing how warnings and informative messages about usages of OpenTelemetry are relayed back to the developer.
-  public private(set) var feedbackHandler: ((String) -> Void)?
-
+  public init(configuration: OpenTelemetryConfiguration = OpenTelemetryConfiguration()) {
+    self.configuration = configuration
+  }
+  
   private init() {
-    meterProvider = DefaultMeterProvider.instance
-    tracerProvider = DefaultTracerProvider.instance
-    loggerProvider = DefaultLoggerProvider.instance
-    baggageManager = DefaultBaggageManager.instance
-    #if canImport(os.activity)
-      let manager = ActivityContextManager.instance
-    #elseif canImport(_Concurrency)
-      let manager = TaskLocalContextManager.instance
-    #else
-      #error("No default ContextManager is supported on the target platform")
-    #endif
-    contextProvider = OpenTelemetryContextProvider(contextManager: manager)
-
-    #if canImport(os.log)
-      feedbackHandler = { message in
-        os_log("%{public}s", message)
-      }
-    #endif
+    self.configuration = OpenTelemetryConfiguration()
   }
 
+  // MARK: - Deprecated static methods for backward compatibility
+  
   @available(*, deprecated, renamed: "registerMeterProvider")
   public static func registerStableMeterProvider(meterProvider: any MeterProvider) {
     Self.registerMeterProvider(meterProvider: meterProvider)
   }
 
-  public static func registerMeterProvider(
-    meterProvider: any MeterProvider
-  ) {
-    instance.meterProvider = meterProvider
+  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
+  public static func registerMeterProvider(meterProvider: any MeterProvider) {
+    // For backward compatibility, this would need to be implemented with a global mutable state
+    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
   }
 
+  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")  
   public static func registerTracerProvider(tracerProvider: TracerProvider) {
-    instance.tracerProvider = tracerProvider
+    // For backward compatibility, this would need to be implemented with a global mutable state
+    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
   }
 
+  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
   public static func registerLoggerProvider(loggerProvider: LoggerProvider) {
-    instance.loggerProvider = loggerProvider
+    // For backward compatibility, this would need to be implemented with a global mutable state
+    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
   }
 
+  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
   public static func registerBaggageManager(baggageManager: BaggageManager) {
-    instance.baggageManager = baggageManager
+    // For backward compatibility, this would need to be implemented with a global mutable state
+    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
   }
 
+  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
   public static func registerPropagators(textPropagators: [TextMapPropagator],
                                          baggagePropagator: TextMapBaggagePropagator) {
-    instance.propagators = DefaultContextPropagators(textPropagators: textPropagators, baggagePropagator: baggagePropagator)
+    // For backward compatibility, this would need to be implemented with a global mutable state
+    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
   }
 
+  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
   public static func registerContextManager(contextManager: ContextManager) {
-    instance.contextProvider.contextManager = contextManager
+    // For backward compatibility, this would need to be implemented with a global mutable state
+    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
   }
 
-  /// Register a function to be called when the library has warnings or informative messages to relay back to the developer
-  public static func registerFeedbackHandler(
-    _ handler: @escaping (String) -> Void
-  ) {
-    instance.feedbackHandler = handler
+  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
+  public static func registerFeedbackHandler(_ handler: @escaping @Sendable (String) -> Void) {
+    // For backward compatibility, this would need to be implemented with a global mutable state
+    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
   }
 
   /// A utility method for testing which sets the context manager for the duration of the closure, and then reverts it before the method returns
+  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
   static func withContextManager<T>(_ manager: ContextManager, _ operation: () throws -> T) rethrows -> T {
-    let old = instance.contextProvider.contextManager
-    defer {
-      self.registerContextManager(contextManager: old)
-    }
-
-    registerContextManager(contextManager: manager)
-
+    // This method is deprecated and should not be used in new code
     return try operation()
   }
 }

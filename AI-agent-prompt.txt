@@ -1,0 +1,302 @@
+# AI Agent Prompt: OpenTelemetry Swift SDK Migration to Swift 6 Concurrency
+
+## Objective
+Migrate the OpenTelemetry Swift SDK away from singleton patterns to make it Swift 6 strict concurrency compliant. The migration should eliminate global mutable state while maintaining backward compatibility and ensuring thread safety without requiring main thread execution.
+
+## Current Problem
+The SDK uses multiple singleton patterns that violate Swift 6 strict concurrency rules:
+- `OpenTelemetry.instance` with mutable static registration methods
+- Default providers using `static let instance` patterns
+- Context managers with singleton instances
+- Global mutable state accessed from multiple threads
+
+## Migration Strategy
+
+### Phase 1: Create New Concurrency-Safe APIs
+
+#### 1.1 Create OpenTelemetryConfiguration (Sendable)
+Create `Sources/OpenTelemetryApi/OpenTelemetryConfiguration.swift`:
+
+```swift
+import Foundation
+
+/// Immutable configuration for OpenTelemetry components
+public struct OpenTelemetryConfiguration: Sendable {
+    public let tracerProvider: TracerProvider
+    public let meterProvider: any MeterProvider & Sendable
+    public let loggerProvider: LoggerProvider
+    public let baggageManager: BaggageManager
+    public let propagators: ContextPropagators
+    public let contextProvider: OpenTelemetryContextProvider
+    public let feedbackHandler: (@Sendable (String) -> Void)?
+    
+    public init(
+        tracerProvider: TracerProvider? = nil,
+        meterProvider: (any MeterProvider & Sendable)? = nil,
+        loggerProvider: LoggerProvider? = nil,
+        baggageManager: BaggageManager? = nil,
+        propagators: ContextPropagators? = nil,
+        contextManager: ContextManager? = nil,
+        feedbackHandler: (@Sendable (String) -> Void)? = nil
+    ) {
+        self.tracerProvider = tracerProvider ?? DefaultTracerProvider()
+        self.meterProvider = meterProvider ?? DefaultMeterProvider()
+        self.loggerProvider = loggerProvider ?? DefaultLoggerProvider()
+        self.baggageManager = baggageManager ?? DefaultBaggageManager()
+        self.propagators = propagators ?? DefaultContextPropagators(
+            textPropagators: [W3CTraceContextPropagator()],
+            baggagePropagator: W3CBaggagePropagator()
+        )
+        
+        let manager: ContextManager
+        if let contextManager = contextManager {
+            manager = contextManager
+        } else {
+            #if canImport(os.activity)
+                manager = ActivityContextManager()
+            #elseif canImport(_Concurrency)
+                manager = TaskLocalContextManager()
+            #else
+                #error("No default ContextManager is supported on the target platform")
+            #endif
+        }
+        
+        self.contextProvider = OpenTelemetryContextProvider(contextManager: manager)
+        self.feedbackHandler = feedbackHandler
+    }
+}
+```
+
+#### 1.2 Create Thread-Safe OpenTelemetry Instance
+Modify `Sources/OpenTelemetryApi/OpenTelemetry.swift`:
+
+```swift
+/// This class provides thread-safe access to telemetry objects Tracer, Meter and BaggageManager.
+public final class OpenTelemetry: Sendable {
+    public static let version = "v1.21.0"
+    
+    /// Backward compatibility - deprecated global instance
+    @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
+    public static let instance = OpenTelemetry()
+    
+    private let configuration: OpenTelemetryConfiguration
+    
+    /// Registered tracerProvider from configuration
+    public var tracerProvider: TracerProvider { configuration.tracerProvider }
+    
+    /// Registered MeterProvider from configuration  
+    public var meterProvider: any MeterProvider { configuration.meterProvider }
+    
+    /// Registered LoggerProvider from configuration
+    public var loggerProvider: LoggerProvider { configuration.loggerProvider }
+    
+    /// Registered BaggageManager from configuration
+    public var baggageManager: BaggageManager { configuration.baggageManager }
+    
+    /// Registered propagators from configuration
+    public var propagators: ContextPropagators { configuration.propagators }
+    
+    /// Context provider from configuration
+    public var contextProvider: OpenTelemetryContextProvider { configuration.contextProvider }
+    
+    /// Feedback handler from configuration
+    public var feedbackHandler: (@Sendable (String) -> Void)? { configuration.feedbackHandler }
+    
+    public init(configuration: OpenTelemetryConfiguration = OpenTelemetryConfiguration()) {
+        self.configuration = configuration
+    }
+    
+    // MARK: - Deprecated static methods for backward compatibility
+    
+    @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
+    public static func registerMeterProvider(meterProvider: any MeterProvider) {
+        // Implementation for backward compatibility
+    }
+    
+    @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")  
+    public static func registerTracerProvider(tracerProvider: TracerProvider) {
+        // Implementation for backward compatibility
+    }
+    
+    @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
+    public static func registerLoggerProvider(loggerProvider: LoggerProvider) {
+        // Implementation for backward compatibility
+    }
+    
+    @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
+    public static func registerBaggageManager(baggageManager: BaggageManager) {
+        // Implementation for backward compatibility
+    }
+    
+    @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
+    public static func registerPropagators(textPropagators: [TextMapPropagator], baggagePropagator: TextMapBaggagePropagator) {
+        // Implementation for backward compatibility
+    }
+    
+    @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
+    public static func registerContextManager(contextManager: ContextManager) {
+        // Implementation for backward compatibility
+    }
+    
+    @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
+    public static func registerFeedbackHandler(_ handler: @escaping @Sendable (String) -> Void) {
+        // Implementation for backward compatibility
+    }
+}
+```
+
+### Phase 2: Make Default Providers Thread-Safe
+
+#### 2.1 Update Default Providers
+For each default provider in:
+- `Sources/OpenTelemetryApi/Trace/DefaultTracerProvider.swift`
+- `Sources/OpenTelemetryApi/Metrics/DefaultMeterProvider.swift`  
+- `Sources/OpenTelemetryApi/Logs/DefaultLoggerProvider.swift`
+- `Sources/OpenTelemetryApi/Baggage/DefaultBaggageManager.swift`
+
+Remove singleton patterns and add public initializers:
+
+```swift
+// Remove: public static let instance = DefaultXxxProvider()
+// Add: public init() {}
+// Ensure all methods are thread-safe
+```
+
+#### 2.2 Update Context Managers
+For context managers:
+- `Sources/OpenTelemetryApi/Context/ActivityContextManager.swift`
+- `Sources/OpenTelemetryApi/Context/TaskLocalContextManager.swift`
+
+Remove singleton instances and add public initializers:
+
+```swift
+// Remove: static let instance = XxxContextManager()  
+// Add: public init() {}
+// Ensure thread safety with proper synchronization
+```
+
+### Phase 3: Create Builder Pattern
+
+#### 3.1 Configuration Builder
+Create `Sources/OpenTelemetryApi/OpenTelemetryConfigurationBuilder.swift`:
+
+```swift
+public final class OpenTelemetryConfigurationBuilder: Sendable {
+    private let tracerProvider: TracerProvider?
+    private let meterProvider: (any MeterProvider & Sendable)?
+    private let loggerProvider: LoggerProvider?
+    private let baggageManager: BaggageManager?
+    private let propagators: ContextPropagators?
+    private let contextManager: ContextManager?
+    private let feedbackHandler: (@Sendable (String) -> Void)?
+    
+    public init() {
+        self.tracerProvider = nil
+        self.meterProvider = nil
+        self.loggerProvider = nil
+        self.baggageManager = nil
+        self.propagators = nil
+        self.contextManager = nil
+        self.feedbackHandler = nil
+    }
+    
+    private init(
+        tracerProvider: TracerProvider?,
+        meterProvider: (any MeterProvider & Sendable)?,
+        loggerProvider: LoggerProvider?,
+        baggageManager: BaggageManager?,
+        propagators: ContextPropagators?,
+        contextManager: ContextManager?,
+        feedbackHandler: (@Sendable (String) -> Void)?
+    ) {
+        self.tracerProvider = tracerProvider
+        self.meterProvider = meterProvider
+        self.loggerProvider = loggerProvider
+        self.baggageManager = baggageManager
+        self.propagators = propagators
+        self.contextManager = contextManager
+        self.feedbackHandler = feedbackHandler
+    }
+    
+    public func with(tracerProvider: TracerProvider) -> OpenTelemetryConfigurationBuilder {
+        OpenTelemetryConfigurationBuilder(
+            tracerProvider: tracerProvider,
+            meterProvider: meterProvider,
+            loggerProvider: loggerProvider,
+            baggageManager: baggageManager,
+            propagators: propagators,
+            contextManager: contextManager,
+            feedbackHandler: feedbackHandler
+        )
+    }
+    
+    // Similar methods for other components...
+    
+    public func build() -> OpenTelemetryConfiguration {
+        OpenTelemetryConfiguration(
+            tracerProvider: tracerProvider,
+            meterProvider: meterProvider,
+            loggerProvider: loggerProvider,
+            baggageManager: baggageManager,
+            propagators: propagators,
+            contextManager: contextManager,
+            feedbackHandler: feedbackHandler
+        )
+    }
+}
+```
+
+### Phase 4: Update Examples and Documentation
+
+#### 4.1 Update Example Usage
+Transform examples from:
+```swift
+OpenTelemetry.registerTracerProvider(tracerProvider: provider)
+let tracer = OpenTelemetry.instance.tracerProvider.get(...)
+```
+
+To:
+```swift
+let config = OpenTelemetryConfigurationBuilder()
+    .with(tracerProvider: provider)
+    .build()
+
+let openTelemetry = OpenTelemetry(configuration: config)
+let tracer = openTelemetry.tracerProvider.get(...)
+```
+
+#### 4.2 Create Migration Guide
+Document the migration path in a new `SWIFT6_MIGRATION.md` file.
+
+## Key Requirements
+
+1. **No @MainActor**: Do not use `@MainActor` - all code should work on any thread
+2. **Sendable Compliance**: All new types must conform to `Sendable`
+3. **Thread Safety**: Use proper synchronization (locks, actors, immutable state)
+4. **Backward Compatibility**: Keep deprecated APIs functional during transition
+5. **Immutable Configuration**: Once created, configurations should be immutable
+6. **Value Semantics**: Prefer structs and immutable classes where possible
+
+## Implementation Order
+
+1. Create new concurrency-safe APIs alongside existing ones
+2. Update default providers to remove singletons
+3. Add builder pattern for easy configuration
+4. Update examples to demonstrate new patterns
+5. Add deprecation warnings to old APIs
+6. Create comprehensive migration documentation
+
+## Testing Strategy
+
+1. Ensure all existing tests pass with new APIs
+2. Add concurrency tests to verify thread safety
+3. Test backward compatibility with deprecated APIs
+4. Add integration tests with different configurations
+
+## Success Criteria
+
+- All singleton patterns eliminated
+- Swift 6 strict concurrency mode compiles without warnings
+- Backward compatibility maintained
+- Clear migration path documented
+- Performance equivalent or better than current implementation

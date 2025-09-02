@@ -10,7 +10,7 @@ import Foundation
  * https://www.jaegertracing.io/docs/client-libraries/#propagation-format
  */
 
-public class JaegerPropagator: TextMapPropagator {
+public final class JaegerPropagator: TextMapPropagator, @unchecked Sendable {
   static let propagationHeader = "uber-trace-id"
   // Parent span has been deprecated but Jaeger propagation protocol requires it
   static let deprecatedParentSpan = "0"

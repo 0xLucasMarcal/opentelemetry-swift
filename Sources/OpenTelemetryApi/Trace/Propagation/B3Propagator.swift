@@ -9,7 +9,7 @@ import Foundation
  * Implementation of the B3 propagation protocol. See
  * https://github.com/openzipkin/b3-propagation
  */
-public class B3Propagator: TextMapPropagator {
+public final class B3Propagator: TextMapPropagator, @unchecked Sendable {
   static let traceIdHeader = "X-B3-TraceId"
   static let spanIdHeader = "X-B3-SpanId"
   static let sampledHeader = "X-B3-Sampled"

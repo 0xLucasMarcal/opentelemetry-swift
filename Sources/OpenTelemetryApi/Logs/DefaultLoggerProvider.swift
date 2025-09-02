@@ -5,36 +5,35 @@
 
 import Foundation
 
-public class DefaultLoggerProvider: LoggerProvider {
+public final class DefaultLoggerProvider: LoggerProvider {
+  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
   public static let instance: LoggerProvider = DefaultLoggerProvider()
-  fileprivate static let noopBuilderWithDomain = NoopLoggerBuilder(true)
-  fileprivate static let noopBuilderNoDomain = NoopLoggerBuilder(false)
+
+  public init() {}
 
   public func get(instrumentationScopeName: String) -> Logger {
     return loggerBuilder(instrumentationScopeName: instrumentationScopeName).build()
   }
 
   public func loggerBuilder(instrumentationScopeName: String) -> LoggerBuilder {
-    return Self.noopBuilderNoDomain
+    return NoopLoggerBuilder(false)
   }
 }
 
-private class NoopLoggerBuilder: LoggerBuilder {
+private final class NoopLoggerBuilder: LoggerBuilder {
   private let hasDomain: Bool
 
   fileprivate init(_ hasDomain: Bool) {
     self.hasDomain = hasDomain
   }
 
-  // swiftlint:disable force_cast
   public func setEventDomain(_ eventDomain: String) -> Self {
+    // Return a new builder with the appropriate domain setting
     if eventDomain.isEmpty {
-      return DefaultLoggerProvider.noopBuilderNoDomain as! Self
+      return NoopLoggerBuilder(false) as! Self
     }
-    return DefaultLoggerProvider.noopBuilderWithDomain as! Self
+    return NoopLoggerBuilder(true) as! Self
   }
-
-  // swiftlint:enable force_cast
 
   public func setSchemaUrl(_ schemaUrl: String) -> Self {
     return self
@@ -53,6 +52,6 @@ private class NoopLoggerBuilder: LoggerBuilder {
   }
 
   public func build() -> Logger {
-    return DefaultLogger.getInstance(hasDomain)
+    return DefaultLogger(hasDomain: hasDomain)
   }
 }

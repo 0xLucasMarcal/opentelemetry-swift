@@ -5,7 +5,7 @@
 
 import Foundation
 
-public protocol TextMapBaggagePropagator {
+public protocol TextMapBaggagePropagator: Sendable {
   /// Gets the list of headers used by propagator.
   var fields: Set<String> { get }
 

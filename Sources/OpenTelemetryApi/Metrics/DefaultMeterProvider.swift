@@ -8,24 +8,22 @@ import Foundation
 @available(*, deprecated, renamed: "DefaultMeterProvider")
 public typealias DefaultStableMeterProvider = DefaultMeterProvider
 
-public class DefaultMeterProvider: MeterProvider {
-  static let noopMeterBuilder = NoopMeterBuilder()
-
+public final class DefaultMeterProvider: MeterProvider, @unchecked Sendable {
   public static func noop() -> NoopMeterBuilder {
-    noopMeterBuilder
+    NoopMeterBuilder()
   }
 
+  public init() {}
+
   public func get(name: String) -> DefaultMeter {
-    NoopMeterBuilder.noopMeter
+    DefaultMeter()
   }
 
   public func meterBuilder(name: String) -> NoopMeterBuilder {
-    Self.noop()
+    NoopMeterBuilder()
   }
 
-  public class NoopMeterBuilder: MeterBuilder {
-    static let noopMeter = DefaultMeter()
-
+  public final class NoopMeterBuilder: MeterBuilder {
     public func setSchemaUrl(schemaUrl: String) -> Self {
       self
     }
@@ -39,9 +37,10 @@ public class DefaultMeterProvider: MeterProvider {
     }
 
     public func build() -> DefaultMeter {
-      Self.noopMeter
+      DefaultMeter()
     }
   }
 
-  public static var instance = DefaultMeterProvider()
+  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
+  public static let instance = DefaultMeterProvider()
 }

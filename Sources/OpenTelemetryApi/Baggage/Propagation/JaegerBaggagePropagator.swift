@@ -10,7 +10,7 @@ import Foundation
  * https://www.jaegertracing.io/docs/client-libraries/#propagation-format
  */
 
-public class JaegerBaggagePropagator: TextMapBaggagePropagator {
+public final class JaegerBaggagePropagator: TextMapBaggagePropagator, @unchecked Sendable {
   public static let baggageHeader = "jaeger-baggage"
   public static let baggagePrefix = "uberctx-"
 

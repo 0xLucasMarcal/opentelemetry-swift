@@ -2138,7 +2138,7 @@ public enum SemanticAttributes: String {
    Deprecated, use `network.transport`.
    */
   /// - Tag: otelNetTransportValues
-  public struct NetTransportValues: CustomStringConvertible {
+  public struct NetTransportValues: CustomStringConvertible, Sendable {
     /**
      ip_tcp.
      */
@@ -2175,7 +2175,7 @@ public enum SemanticAttributes: String {
    Deprecated, use `network.transport` and `network.type`.
    */
   /// - Tag: otelNetSockFamilyValues
-  public struct NetSockFamilyValues: CustomStringConvertible {
+  public struct NetSockFamilyValues: CustomStringConvertible, Sendable {
     /**
      IPv4 address.
      */
@@ -2204,7 +2204,7 @@ public enum SemanticAttributes: String {
    HTTP request method.
    */
   /// - Tag: otelHttpRequestMethodValues
-  public struct HttpRequestMethodValues: CustomStringConvertible {
+  public struct HttpRequestMethodValues: CustomStringConvertible, Sendable {
     /**
      CONNECT method.
      */
@@ -2261,7 +2261,7 @@ public enum SemanticAttributes: String {
    The domain identifies the business context for the events.
    */
   /// - Tag: otelEventDomainValues
-  public struct EventDomainValues: CustomStringConvertible {
+  public struct EventDomainValues: CustomStringConvertible, Sendable {
     /**
      Events from browser apps.
      */
@@ -2335,7 +2335,7 @@ public enum SemanticAttributes: String {
    An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
    */
   /// - Tag: otelDbSystemValues
-  public struct DbSystemValues: CustomStringConvertible {
+  public struct DbSystemValues: CustomStringConvertible, Sendable {
     /**
      Some other SQL database. Fallback only. See notes.
      */
@@ -2560,7 +2560,7 @@ public enum SemanticAttributes: String {
    [OSI Transport Layer](https://osi-model.com/transport-layer/) or [Inter-process Communication method](https://en.wikipedia.org/wiki/Inter-process_communication). The value SHOULD be normalized to lowercase.
    */
   /// - Tag: otelNetworkTransportValues
-  public struct NetworkTransportValues: CustomStringConvertible {
+  public struct NetworkTransportValues: CustomStringConvertible, Sendable {
     /**
      TCP.
      */
@@ -2593,7 +2593,7 @@ public enum SemanticAttributes: String {
    [OSI Network Layer](https://osi-model.com/network-layer/) or non-OSI equivalent. The value SHOULD be normalized to lowercase.
    */
   /// - Tag: otelNetworkTypeValues
-  public struct NetworkTypeValues: CustomStringConvertible {
+  public struct NetworkTypeValues: CustomStringConvertible, Sendable {
     /**
      IPv4.
      */
@@ -2669,7 +2669,7 @@ public enum SemanticAttributes: String {
    CosmosDB Operation Type.
    */
   /// - Tag: otelDbCosmosdbOperationTypeValues
-  public struct DbCosmosdbOperationTypeValues: CustomStringConvertible {
+  public struct DbCosmosdbOperationTypeValues: CustomStringConvertible, Sendable {
     /**
      invalid.
      */
@@ -2803,7 +2803,7 @@ public enum SemanticAttributes: String {
    Describes the type of the operation that was performed on the data.
    */
   /// - Tag: otelFaasDocumentOperationValues
-  public struct FaasDocumentOperationValues: CustomStringConvertible {
+  public struct FaasDocumentOperationValues: CustomStringConvertible, Sendable {
     /**
      When a new object is created.
      */
@@ -2832,7 +2832,7 @@ public enum SemanticAttributes: String {
    A string identifying the kind of messaging operation as defined in the [Operation names](#operation-names) section above.
    */
   /// - Tag: otelMessagingOperationValues
-  public struct MessagingOperationValues: CustomStringConvertible {
+  public struct MessagingOperationValues: CustomStringConvertible, Sendable {
     /**
      publish.
      */
@@ -2861,7 +2861,7 @@ public enum SemanticAttributes: String {
    The cloud provider of the invoked function.
    */
   /// - Tag: otelFaasInvokedProviderValues
-  public struct FaasInvokedProviderValues: CustomStringConvertible {
+  public struct FaasInvokedProviderValues: CustomStringConvertible, Sendable {
     /**
      Alibaba Cloud.
      */
@@ -2898,7 +2898,7 @@ public enum SemanticAttributes: String {
    The internet connection type.
    */
   /// - Tag: otelNetworkConnectionTypeValues
-  public struct NetworkConnectionTypeValues: CustomStringConvertible {
+  public struct NetworkConnectionTypeValues: CustomStringConvertible, Sendable {
     /**
      wifi.
      */
@@ -2935,7 +2935,7 @@ public enum SemanticAttributes: String {
    This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
    */
   /// - Tag: otelNetworkConnectionSubtypeValues
-  public struct NetworkConnectionSubtypeValues: CustomStringConvertible {
+  public struct NetworkConnectionSubtypeValues: CustomStringConvertible, Sendable {
     /**
      GPRS.
      */
@@ -3036,7 +3036,7 @@ public enum SemanticAttributes: String {
    The value `aws-api`.
    */
   /// - Tag: otelRpcSystemValues
-  public struct RpcSystemValues: CustomStringConvertible {
+  public struct RpcSystemValues: CustomStringConvertible, Sendable {
     /**
      gRPC.
      */

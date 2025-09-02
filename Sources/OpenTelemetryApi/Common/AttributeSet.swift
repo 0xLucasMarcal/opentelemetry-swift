@@ -5,13 +5,14 @@
 
 import Foundation
 
-open class AttributeSet: Hashable, Codable {
+open class AttributeSet: Hashable, Codable, @unchecked Sendable {
   public private(set) var labels: [String: AttributeValue]
 
   /// Empty LabelSet.
-  public static var empty = AttributeSet()
+  @available(*, deprecated, message: "Create new instances instead of using shared instance")
+  public static let empty = AttributeSet()
 
-  private init() {
+  public init() {
     labels = [String: AttributeValue]()
   }
 

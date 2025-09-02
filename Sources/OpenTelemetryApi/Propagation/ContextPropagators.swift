@@ -5,7 +5,7 @@
 
 import Foundation
 
-public protocol ContextPropagators {
+public protocol ContextPropagators: Sendable {
   var textMapPropagator: TextMapPropagator { get }
   var textMapBaggagePropagator: TextMapBaggagePropagator { get }
 }

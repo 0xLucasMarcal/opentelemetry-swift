@@ -6,11 +6,11 @@
 import Foundation
 
 #if canImport(os.activity)
-  import os.activity
+  @preconcurrency import os.activity
 
   // Bridging Obj-C variabled defined as c-macroses. See `activity.h` header.
   // swiftlint:disable identifier_name
-  private let OS_ACTIVITY_CURRENT = unsafeBitCast(dlsym(UnsafeMutableRawPointer(bitPattern: -2), "_os_activity_current"),
+  nonisolated(unsafe) private let OS_ACTIVITY_CURRENT = unsafeBitCast(dlsym(UnsafeMutableRawPointer(bitPattern: -2), "_os_activity_current"),
                                                   to: os_activity_t.self)
   // swiftlint:enable identifier_name
   @_silgen_name("_os_activity_create") private func _os_activity_create(
@@ -20,10 +20,13 @@ import Foundation
     _ flags: os_activity_flag_t
   ) -> AnyObject!
 
-  class ActivityContextManager: ImperativeContextManager {
+  final class ActivityContextManager: ImperativeContextManager {
+    @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
     static let instance = ActivityContextManager()
 
     let rlock = NSRecursiveLock()
+
+    public init() {}
 
     class ScopeElement {
       init(scope: os_activity_scope_state_s) {
@@ -33,8 +36,8 @@ import Foundation
       var scope: os_activity_scope_state_s
     }
 
-    var objectScope = NSMapTable<AnyObject, ScopeElement>(keyOptions: .weakMemory, valueOptions: .strongMemory)
-    var contextMap = [os_activity_id_t: [String: AnyObject]]()
+    nonisolated(unsafe) var objectScope = NSMapTable<AnyObject, ScopeElement>(keyOptions: .weakMemory, valueOptions: .strongMemory)
+    nonisolated(unsafe) var contextMap = [os_activity_id_t: [String: AnyObject]]()
 
     func getCurrentContextValue(forKey key: OpenTelemetryContextKeys)
       -> AnyObject? {

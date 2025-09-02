@@ -10,7 +10,7 @@ import Foundation
  * https://github.com/openzipkin/brave/blob/master/brave/README.md#remote-baggage
  */
 
-public class ZipkinBaggagePropagator: TextMapBaggagePropagator {
+public final class ZipkinBaggagePropagator: TextMapBaggagePropagator, @unchecked Sendable {
   public static let baggagePrefix = "baggage-"
 
   public let fields: Set<String> = []
