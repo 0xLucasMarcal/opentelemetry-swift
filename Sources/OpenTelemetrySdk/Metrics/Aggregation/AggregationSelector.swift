@@ -6,18 +6,17 @@
 import Foundation
 import OpenTelemetryApi
 
-public typealias AggregationResolver = (InstrumentType) -> Aggregation
+public typealias AggregationResolver = @Sendable (InstrumentType) -> Aggregation
 
 public protocol DefaultAggregationSelector {
   func getDefaultAggregation(for instrument: InstrumentType) -> Aggregation
 }
 
-public class AggregationSelector: DefaultAggregationSelector {
-  public static let instance = AggregationSelector()
+public final class AggregationSelector: DefaultAggregationSelector, Sendable {
 
   public let selector: AggregationResolver
 
-  init(selector: @escaping AggregationResolver = AggregationSelector.defaultSelector()) {
+  public init(selector: @escaping AggregationResolver = AggregationSelector.defaultSelector()) {
     self.selector = selector
   }
 

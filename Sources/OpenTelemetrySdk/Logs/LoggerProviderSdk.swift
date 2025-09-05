@@ -6,7 +6,7 @@
 import Foundation
 import OpenTelemetryApi
 
-public class LoggerProviderSdk: LoggerProvider {
+public final class LoggerProviderSdk: LoggerProvider, @unchecked Sendable {
   private var sharedState: LoggerSharedState
   private let loggerRegistry: ComponentRegistry<LoggerSdk>
   public init(clock: Clock = MillisClock(),

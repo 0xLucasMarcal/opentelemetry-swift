@@ -9,8 +9,8 @@
 
   import Network
 
-  public class NetworkMonitor: NetworkMonitorProtocol {
-    let monitor = NWPathMonitor()
+  public final class NetworkMonitor: NetworkMonitorProtocol, @unchecked Sendable {
+    let monitor: NWPathMonitor = NWPathMonitor()
     var connection: Connection = .unavailable
     let monitorQueue = DispatchQueue(label: "OTel-Network-Monitor")
     let lock = NSLock()
@@ -20,7 +20,8 @@
     }
 
     public init() throws {
-      let pathHandler = { (path: NWPath) in
+      let pathHandler: @Sendable (NWPath) -> Void = { [weak self] (path: NWPath) in
+        guard let self = self else { return }
         let availableInterfaces = path.availableInterfaces
         let wifiInterface = self.getWifiInterface(interfaces: availableInterfaces)
         let cellInterface = self.getCellInterface(interfaces: availableInterfaces)

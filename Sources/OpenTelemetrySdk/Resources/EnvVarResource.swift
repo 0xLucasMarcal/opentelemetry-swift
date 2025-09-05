@@ -12,9 +12,6 @@ public struct EnvVarResource {
   private static let labelListSplitter = Character(",")
   private static let labelKeyValueSplitter = Character("=")
 
-  ///  This resource information is loaded from the OC_RESOURCE_LABELS
-  ///  environment variable or from the Info.plist file of the application loading the framework.
-  public static let resource = Resource().merging(other: Resource(attributes: parseResourceAttributes(rawEnvAttributes: ProcessInfo.processInfo.environment[otelResourceAttributesEnv])))
   private init() {}
 
   public static func get(environment: [String: String] = ProcessInfo.processInfo.environment) -> Resource {

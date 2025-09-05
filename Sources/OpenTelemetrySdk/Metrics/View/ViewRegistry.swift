@@ -25,7 +25,7 @@ public class ViewRegistry {
             aggregation: aggregationSelector.getDefaultAggregation(for: type)
           )
           .build(),
-        attributeProcessor: NoopAttributeProcessor.noop
+        attributeProcessor: NoopAttributeProcessor()
       )
     }
     self.registeredViews = registeredViews

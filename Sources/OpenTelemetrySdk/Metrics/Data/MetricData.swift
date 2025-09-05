@@ -6,7 +6,7 @@
 import Foundation
 import OpenTelemetryApi
 
-public enum MetricDataType: Codable {
+public enum MetricDataType: Codable, Sendable {
   case LongGauge
   case DoubleGauge
   case LongSum
@@ -19,7 +19,7 @@ public enum MetricDataType: Codable {
 @available(*, deprecated, renamed: "MetricData")
 public typealias StableMetricData = MetricData
 
-public struct MetricData: Equatable, Codable {
+public struct MetricData: Equatable, Codable, Sendable {
   public private(set) var resource: Resource
   public private(set) var instrumentationScopeInfo: InstrumentationScopeInfo
   public private(set) var name: String
@@ -41,7 +41,7 @@ public struct MetricData: Equatable, Codable {
       .Data(aggregationTemporality: .cumulative, points: [PointData]())
   )
 
-  public class Data: Equatable {
+  public class Data: Equatable, @unchecked Sendable {
     public private(set) var points: [PointData]
     public private(set) var aggregationTemporality: AggregationTemporality
 

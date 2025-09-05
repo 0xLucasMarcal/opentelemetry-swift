@@ -131,7 +131,7 @@ class SpanBuilderSdk: SpanBuilder {
                                          traceState: traceState)
 
     if !samplingDecision.isSampled {
-      return DefaultTracer.instance.spanBuilder(spanName: spanName).startSpan()
+      return DefaultTracer().spanBuilder(spanName: spanName).startSpan()
     }
 
     attributes.updateValues(attributes: samplingDecision.attributes)
@@ -156,7 +156,7 @@ class SpanBuilderSdk: SpanBuilder {
     let createdSpan = prepareSpan()
 
     if startAsActive {
-      OpenTelemetry.instance.contextProvider.setActiveSpan(createdSpan)
+      OpenTelemetry.defaultContextProvider.setActiveSpan(createdSpan)
     }
     return createdSpan
   }
@@ -167,7 +167,7 @@ class SpanBuilderSdk: SpanBuilder {
       createdSpan.end()
     }
 
-    return try OpenTelemetry.instance.contextProvider.withActiveSpan(createdSpan) {
+    return try OpenTelemetry.defaultContextProvider.withActiveSpan(createdSpan) {
       try operation(createdSpan)
     }
   }
@@ -180,7 +180,7 @@ class SpanBuilderSdk: SpanBuilder {
         createdSpan.end()
       }
 
-      return try await OpenTelemetry.instance.contextProvider.withActiveSpan(createdSpan) {
+      return try await OpenTelemetry.defaultContextProvider.withActiveSpan(createdSpan) {
         try await operation(createdSpan)
       }
     }
@@ -195,7 +195,7 @@ class SpanBuilderSdk: SpanBuilder {
   }
 
   private func getParentContext(parentType: ParentType, explicitParent: Span?, remoteParent: SpanContext?) -> SpanContext? {
-    let currentSpan = OpenTelemetry.instance.contextProvider.activeSpan
+    let currentSpan = OpenTelemetry.defaultContextProvider.activeSpan
 
     let parentContext: SpanContext? = switch parentType {
     case .noParent:
@@ -214,7 +214,7 @@ class SpanBuilderSdk: SpanBuilder {
   private static func getParentSpan(parentType: ParentType, explicitParent: Span?) -> Span? {
     switch parentType {
     case .currentSpan:
-      return OpenTelemetry.instance.contextProvider.activeSpan
+      return OpenTelemetry.defaultContextProvider.activeSpan
     case .explicitParent:
       return explicitParent
     default:

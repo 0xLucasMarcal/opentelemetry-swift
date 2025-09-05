@@ -5,7 +5,7 @@
 
 import Foundation
 
-public struct MetricDescriptor: Hashable {
+public struct MetricDescriptor: Hashable, Sendable {
   public private(set) var name: String
   public private(set) var description: String
   public private(set) var view: View

@@ -63,7 +63,7 @@ public struct W3CBaggagePropagator: TextMapBaggagePropagator {
       return nil
     }
 
-    let builder = OpenTelemetry.instance.baggageManager.baggageBuilder()
+    let builder = DefaultBaggageManager().baggageBuilder()
 
     let listMembers = baggageHeader.components(separatedBy: ",")
     for listMember in listMembers {

@@ -7,8 +7,7 @@ import Foundation
 
 open class AttributeArray: Hashable, Codable, @unchecked Sendable {
   public private(set) var values: [AttributeValue]
-  @available(*, deprecated, message: "Create new instances instead of using shared instance")
-  public static let empty = AttributeArray()
+
   public var description: String {
     values.description
   }

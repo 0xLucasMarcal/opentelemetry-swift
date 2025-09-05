@@ -6,11 +6,9 @@
 import Foundation
 import OpenTelemetryApi
 
-public class Base2ExponentialHistogramAggregation: Aggregation {
+public final class Base2ExponentialHistogramAggregation: Aggregation, Sendable {
   private static let defaultMaxBuckets = 160
   private static let defaultMaxScale = 20
-
-  public private(set) static var instance = Base2ExponentialHistogramAggregation(maxBuckets: defaultMaxBuckets, maxScale: defaultMaxScale)
 
   let maxBuckets: Int
   let maxScale: Int

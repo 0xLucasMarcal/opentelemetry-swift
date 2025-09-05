@@ -6,9 +6,7 @@
 import Foundation
 import OpenTelemetryApi
 
-public class Base2ExponentialHistogramIndexer: Codable {
-  private static var cache = [Int: Base2ExponentialHistogramIndexer]()
-  private static var cacheLock = Lock()
+public final class Base2ExponentialHistogramIndexer: Codable, @unchecked Sendable {
 
   private let scale: Int
   private let scaleFactor: Double
@@ -19,17 +17,8 @@ public class Base2ExponentialHistogramIndexer: Codable {
   }
 
   func get(_ scale: Int) -> Base2ExponentialHistogramIndexer {
-    Self.cacheLock.lock()
-    defer {
-      Self.cacheLock.unlock()
-    }
-    if let indexer = Self.cache[scale] {
-      return indexer
-    } else {
-      let indexer = Base2ExponentialHistogramIndexer(scale: scale)
-      Self.cache[scale] = indexer
-      return indexer
-    }
+    // For simplicity and concurrency safety, just create a new instance
+    return Base2ExponentialHistogramIndexer(scale: scale)
   }
 
   func computeIndex(_ value: Double) -> Int {

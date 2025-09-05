@@ -6,8 +6,8 @@
 import Foundation
 import OpenTelemetryApi
 
-class LoggingTextFormat: TextMapPropagator {
-  var fields = Set<String>()
+final class LoggingTextFormat: TextMapPropagator, @unchecked Sendable {
+  let fields = Set<String>()
 
   func inject(spanContext: SpanContext, carrier: inout [String: String], setter: some Setter) {
     Logger.log("LoggingTextFormat.Inject(\(spanContext), ...)")

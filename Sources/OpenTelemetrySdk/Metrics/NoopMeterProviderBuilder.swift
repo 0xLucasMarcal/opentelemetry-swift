@@ -50,6 +50,6 @@ public class NoopMeterProviderBuilder {
   }
 
   public func build() -> DefaultMeterProvider {
-    DefaultMeterProvider.instance
+    DefaultMeterProvider()
   }
 }

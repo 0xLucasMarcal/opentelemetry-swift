@@ -6,7 +6,7 @@
 import Foundation
 import OpenTelemetryApi
 
-public class LoggerBuilderSdk: LoggerBuilder {
+public final class LoggerBuilderSdk: LoggerBuilder, @unchecked Sendable {
   private let registry: ComponentRegistry<LoggerSdk>
   private let instrumentationScopeName: String
   private var eventDomain: String?

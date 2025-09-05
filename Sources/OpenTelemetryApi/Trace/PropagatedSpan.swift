@@ -15,7 +15,8 @@ class PropagatedSpan: Span {
   var context: SpanContext
 
   func end() {
-    OpenTelemetry.instance.contextProvider.removeContextForSpan(self)
+    // Note: Without a global OpenTelemetry instance, span cleanup must be handled by the user
+    // or through the OpenTelemetry instance's contextProvider
   }
 
   func end(time: Date) {

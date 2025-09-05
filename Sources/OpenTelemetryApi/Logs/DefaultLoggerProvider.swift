@@ -6,9 +6,6 @@
 import Foundation
 
 public final class DefaultLoggerProvider: LoggerProvider {
-  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
-  public static let instance: LoggerProvider = DefaultLoggerProvider()
-
   public init() {}
 
   public func get(instrumentationScopeName: String) -> Logger {

@@ -21,9 +21,6 @@ import Foundation
   ) -> AnyObject!
 
   final class ActivityContextManager: ImperativeContextManager {
-    @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
-    static let instance = ActivityContextManager()
-
     let rlock = NSRecursiveLock()
 
     public init() {}

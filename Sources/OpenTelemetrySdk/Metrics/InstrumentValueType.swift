@@ -5,7 +5,7 @@
 
 import Foundation
 
-public enum InstrumentValueType {
+public enum InstrumentValueType: Sendable {
   case long
   case double
 }

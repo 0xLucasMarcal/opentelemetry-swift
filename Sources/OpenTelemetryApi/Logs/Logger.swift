@@ -5,7 +5,7 @@
 
 import Foundation
 
-public protocol Logger {
+public protocol Logger: Sendable {
   func eventBuilder(name: String) -> EventBuilder
   func logRecordBuilder() -> LogRecordBuilder
 }

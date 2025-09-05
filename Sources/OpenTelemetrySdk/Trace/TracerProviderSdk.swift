@@ -6,7 +6,7 @@
 import Foundation
 import OpenTelemetryApi
 
-public class TracerProviderSdk: TracerProvider {
+public final class TracerProviderSdk: TracerProvider, @unchecked Sendable {
   private let tracerLock: ReadWriteLock = .init()
   private var tracerProvider = [InstrumentationScopeInfo: TracerSdk]()
   var sharedState: TracerSharedState
@@ -29,7 +29,7 @@ public class TracerProviderSdk: TracerProvider {
 
   public func get(instrumentationName: String, instrumentationVersion: String? = nil, schemaUrl: String? = nil, attributes: [String: AttributeValue]? = nil) -> Tracer {
     if sharedState.hasBeenShutdown {
-      return DefaultTracer.instance
+      return DefaultTracer()
     }
 
     var instrumentationName = instrumentationName

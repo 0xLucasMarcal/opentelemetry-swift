@@ -39,7 +39,7 @@ public class URLSessionInstrumentation {
   private let configurationQueue = DispatchQueue(
       label: "io.opentelemetry.configuration")
 
-  static var instrumentedKey = "io.opentelemetry.instrumentedCall"
+  static let instrumentedKey = "io.opentelemetry.instrumentedCall"
 
   static let excludeList: [String] = [
     "__NSCFURLProxySessionConnection"
@@ -848,13 +848,13 @@ public class URLSessionInstrumentation {
   }
 }
 
-class FakeDelegate: NSObject, URLSessionTaskDelegate {
+final class FakeDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
   func urlSession(_ session: URLSession, task: URLSessionTask,
                   didCompleteWithError error: Error?) {}
 }
 
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
-class AsyncTaskDelegate: NSObject, URLSessionTaskDelegate {
+final class AsyncTaskDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
   private weak var instrumentation: URLSessionInstrumentation?
   private let sessionTaskId: String
 

@@ -18,7 +18,7 @@ public class TracerSdk: Tracer {
 
   public func spanBuilder(spanName: String) -> SpanBuilder {
     if sharedState.hasBeenShutdown {
-      return DefaultTracer.instance.spanBuilder(spanName: spanName)
+      return DefaultTracer().spanBuilder(spanName: spanName)
     }
     return SpanBuilderSdk(spanName: spanName,
                           instrumentationScopeInfo: instrumentationScopeInfo,

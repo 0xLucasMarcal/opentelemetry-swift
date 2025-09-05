@@ -55,63 +55,42 @@ public struct TracerProviderWrapper {
 public struct OpenTelemetry {
   public static var version: String { _OpenTelemetry.version }
 
-  public static var instance = OpenTelemetry()
+  private let inner: _OpenTelemetry
 
-  /// Registered tracerProvider or default via DefaultTracerProvider.instance.
+  public init(configuration: OpenTelemetryApi.OpenTelemetryConfiguration = OpenTelemetryApi.OpenTelemetryConfiguration()) {
+    self.inner = _OpenTelemetry(configuration: configuration)
+  }
+
+  /// Registered tracerProvider from configuration.
   public var tracerProvider: TracerProviderWrapper {
-    TracerProviderWrapper(inner: _OpenTelemetry.instance.tracerProvider)
+    TracerProviderWrapper(inner: inner.tracerProvider)
   }
 
   public var meterProvider: (any MeterProvider)? {
-    _OpenTelemetry.instance.meterProvider
+    inner.meterProvider
   }
 
-  /// Registered LoggerProvider or default via DefaultLoggerProvider.instance.
+  /// Registered LoggerProvider from configuration.
   public var loggerProvider: LoggerProvider {
-    _OpenTelemetry.instance.loggerProvider
+    inner.loggerProvider
   }
 
-  /// registered manager or default via  DefaultBaggageManager.instance.
+  /// registered manager from configuration.
   public var baggageManager: BaggageManager {
-    _OpenTelemetry.instance.baggageManager
+    inner.baggageManager
   }
 
-  /// registered manager or default via  DefaultBaggageManager.instance.
-  public var propagators: ContextPropagators = DefaultContextPropagators(textPropagators: [W3CTraceContextPropagator()], baggagePropagator: W3CBaggagePropagator())
+  /// registered propagators from configuration.
+  public var propagators: ContextPropagators {
+    inner.propagators
+  }
 
-  /// registered manager or default via  DefaultBaggageManager.instance.
+  /// registered context provider from configuration.
   public var contextProvider: OpenTelemetryContextProvider {
-    OpenTelemetryContextProvider(contextManager: _OpenTelemetry.instance.contextProvider.contextManager)
+    OpenTelemetryContextProvider(contextManager: inner.contextProvider.contextManager)
   }
 
-  /// On platforms that support the original default context manager, it is prefered over the structured concurrency context manager when initializing OpenTelemetry. Call this method to register the default structured concurrency context manager instead.
-  public static func registerDefaultConcurrencyContextManager() {
-    _OpenTelemetry.registerContextManager(contextManager: TaskLocalContextManager.instance)
-  }
 
-  public static func registerMeterProvider(meterProvider: any MeterProvider) {
-    _OpenTelemetry.registerMeterProvider(meterProvider: meterProvider)
-  }
-
-  public static func registerTracerProvider(tracerProvider: TracerProvider) {
-    _OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
-  }
-
-  public static func registerLoggerProvider(loggerProvider: LoggerProvider) {
-    _OpenTelemetry.registerLoggerProvider(loggerProvider: loggerProvider)
-  }
-
-  public static func registerBaggageManager(baggageManager: BaggageManager) {
-    _OpenTelemetry.registerBaggageManager(baggageManager: baggageManager)
-  }
-
-  public static func registerPropagators(textPropagators: [TextMapPropagator], baggagePropagator: TextMapBaggagePropagator) {
-    _OpenTelemetry.registerPropagators(textPropagators: textPropagators, baggagePropagator: baggagePropagator)
-  }
-
-  public static func registerContextManager(contextManager: ContextManager) {
-    _OpenTelemetry.registerContextManager(contextManager: contextManager)
-  }
 }
 
 public struct OpenTelemetryContextProvider {

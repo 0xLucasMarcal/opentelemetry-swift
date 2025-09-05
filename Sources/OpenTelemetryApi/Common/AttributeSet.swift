@@ -8,9 +8,7 @@ import Foundation
 open class AttributeSet: Hashable, Codable, @unchecked Sendable {
   public private(set) var labels: [String: AttributeValue]
 
-  /// Empty LabelSet.
-  @available(*, deprecated, message: "Create new instances instead of using shared instance")
-  public static let empty = AttributeSet()
+
 
   public init() {
     labels = [String: AttributeValue]()

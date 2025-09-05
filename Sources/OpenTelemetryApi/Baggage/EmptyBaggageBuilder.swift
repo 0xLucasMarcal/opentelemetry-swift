@@ -23,7 +23,7 @@ class EmptyBaggageBuilder: BaggageBuilder {
   }
 
   func build() -> Baggage {
-    return EmptyBaggage.instance
+    return EmptyBaggage()
   }
 
   init() {}

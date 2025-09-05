@@ -52,7 +52,9 @@ public class DefaultBaggageBuilder: BaggageBuilder {
   public func build() -> Baggage {
     var parentCopy = parent
     if parent == nil, !noImplicitParent {
-      parentCopy = OpenTelemetry.instance.contextProvider.activeBaggage
+      // Note: Without a global OpenTelemetry instance, we cannot access the active baggage
+      // Users should explicitly set the parent baggage when building
+      parentCopy = nil
     }
 
     var combined = entries
@@ -62,6 +64,6 @@ public class DefaultBaggageBuilder: BaggageBuilder {
       }
     }
     return entries.isEmpty
-      ? EmptyBaggage.instance : DefaultBaggage(entries: combined)
+      ? EmptyBaggage() : DefaultBaggage(entries: combined)
   }
 }

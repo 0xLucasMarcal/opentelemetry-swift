@@ -35,7 +35,7 @@ public struct OTelLogHandler: LogHandler {
   ///  - Parameter loggerProvider: The logger provider to use in the bridge. Defaults to the global logger provider.
   ///  - Parameter includeTraceContext : boolean flag used for the logger builder
   ///  - Parameter attributes: attributes to apply to the logger builder
-  public init(loggerProvider: LoggerProvider = OpenTelemetryApi.DefaultLoggerProvider.instance,
+  public init(loggerProvider: LoggerProvider = OpenTelemetryApi.DefaultLoggerProvider(),
               includeTraceContext: Bool = true,
               attributes: [String: AttributeValue] = [String: AttributeValue]()) {
     self.loggerProvider = loggerProvider
@@ -78,9 +78,8 @@ public struct OTelLogHandler: LogHandler {
       .setBody(AttributeValue.string(message.description))
       .setAttributes(otelattributes)
 
-    if let context = OpenTelemetry.instance.contextProvider.activeSpan?.context {
-      _ = event.setSpanContext(context)
-    }
+    // Note: Without a global OpenTelemetry instance, span context must be provided differently
+    // Users should pass an OpenTelemetry instance to the LogHandler if they need span context
     event.emit()
   }
 }

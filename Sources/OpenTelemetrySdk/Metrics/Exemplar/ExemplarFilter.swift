@@ -47,6 +47,6 @@ public struct TraceBasedFilter: ExemplarFilter {
   }
 
   private func hasSampledTrace() -> Bool {
-    OpenTelemetry.instance.contextProvider.activeSpan?.context.isSampled ?? false
+    OpenTelemetry.defaultContextProvider.activeSpan?.context.isSampled ?? false
   }
 }

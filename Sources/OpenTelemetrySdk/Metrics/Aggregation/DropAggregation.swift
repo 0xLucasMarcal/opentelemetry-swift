@@ -6,11 +6,11 @@
 import Foundation
 import OpenTelemetryApi
 
-public class DropAggregation: Aggregation {
-  public private(set) static var instance = DropAggregation()
+public final class DropAggregation: Aggregation, Sendable {
+  public init() {}
 
   public func createAggregator(descriptor: InstrumentDescriptor, exemplarFilter: ExemplarFilter) -> any Aggregator {
-    return DropAggregator()
+    DropAggregator()
   }
 
   public func isCompatible(with descriptor: InstrumentDescriptor) -> Bool {

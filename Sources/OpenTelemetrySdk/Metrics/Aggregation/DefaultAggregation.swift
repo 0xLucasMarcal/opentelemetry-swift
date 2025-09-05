@@ -5,8 +5,8 @@
 
 import Foundation
 
-public class DefaultAggregation: Aggregation {
-  public private(set) static var instance = DefaultAggregation()
+public final class DefaultAggregation: Aggregation, Sendable {
+  public init() {}
 
   public func createAggregator(descriptor: InstrumentDescriptor, exemplarFilter: ExemplarFilter) -> any Aggregator {
     resolve(for: descriptor).createAggregator(descriptor: descriptor, exemplarFilter: exemplarFilter)
@@ -19,16 +19,16 @@ public class DefaultAggregation: Aggregation {
   private func resolve(for instrument: InstrumentDescriptor) -> Aggregation {
     switch instrument.type {
     case .counter, .upDownCounter, .observableCounter, .observableUpDownCounter:
-      return SumAggregation.instance
+      return SumAggregation()
     case .histogram:
       // Use advisory bucket boundaries if available, otherwise use default
       if let advisoryBoundaries = instrument.explicitBucketBoundariesAdvice {
         return ExplicitBucketHistogramAggregation(bucketBoundaries: advisoryBoundaries)
       } else {
-        return ExplicitBucketHistogramAggregation.instance
+        return ExplicitBucketHistogramAggregation(bucketBoundaries: ExplicitBucketHistogramAggregation.DEFAULT_BOUNDARIES)
       }
     case .observableGauge, .gauge:
-      return LastValueAggregation.instance
+      return LastValueAggregation()
     }
   }
 }

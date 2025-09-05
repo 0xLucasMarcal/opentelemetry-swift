@@ -9,7 +9,7 @@ import OpenTelemetryApi
 @available(*, deprecated, renamed: "View")
 public typealias StableView = View
 
-public class View {
+public final class View: @unchecked Sendable {
   public private(set) var name: String?
   public private(set) var description: String?
   public private(set) var aggregation: Aggregation

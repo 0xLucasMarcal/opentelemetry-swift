@@ -7,23 +7,23 @@ import Foundation
 
 public enum Aggregations {
   public static func drop() -> Aggregation {
-    DropAggregation.instance
+    DropAggregation()
   }
 
   public static func defaultAggregation() -> Aggregation {
-    DefaultAggregation.instance
+    DefaultAggregation()
   }
 
   public static func sum() -> Aggregation {
-    SumAggregation.instance
+    SumAggregation()
   }
 
   public static func lastValue() -> Aggregation {
-    LastValueAggregation.instance
+    LastValueAggregation()
   }
 
   public static func explicitBucketHistogram() -> Aggregation {
-    ExplicitBucketHistogramAggregation.instance
+    ExplicitBucketHistogramAggregation(bucketBoundaries: ExplicitBucketHistogramAggregation.DEFAULT_BOUNDARIES)
   }
 
   public static func explicitBucketHistogram(buckets: [Double]) -> Aggregation {
@@ -31,7 +31,7 @@ public enum Aggregations {
   }
 
   static func base2ExponentialBucketHistogram() -> Aggregation {
-    Base2ExponentialHistogramAggregation.instance
+    Base2ExponentialHistogramAggregation(maxBuckets: 160, maxScale: 20)
   }
 
   static func base2ExponentialBucketHistogram(maxBuckets: Int, maxScale: Int) -> Aggregation {

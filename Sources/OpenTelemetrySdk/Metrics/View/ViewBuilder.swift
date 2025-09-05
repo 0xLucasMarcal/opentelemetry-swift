@@ -13,7 +13,7 @@ public class ViewBuilder {
 
   private var aggregation: Aggregation = Aggregations.defaultAggregation()
 
-  private var processor: AttributeProcessor = NoopAttributeProcessor.noop
+  private var processor: AttributeProcessor = NoopAttributeProcessor()
 
   public func withName(name: String) -> Self {
     self.name = name

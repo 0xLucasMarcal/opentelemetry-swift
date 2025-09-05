@@ -23,7 +23,7 @@ public class SynchronousMetricStorage: SynchronousMetricStorageProtocol {
   private let aggregatorHandlesQueue = DispatchQueue(label: "org.opentelemetry.SynchronousMetricStorage.aggregatorHandlesQueue")
 
   static func empty() -> SynchronousMetricStorageProtocol {
-    return EmptyMetricStorage.instance
+    return EmptyMetricStorage()
   }
 
   static func create(registeredReader: RegisteredReader,

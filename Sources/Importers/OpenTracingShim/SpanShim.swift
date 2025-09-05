@@ -30,7 +30,7 @@ public class SpanShim: OTSpan, BaseShimProtocol {
   }
 
   public func tracer() -> OTTracer {
-    return TraceShim.instance.otTracer
+    return TraceShim().otTracer
   }
 
   public func setOperationName(_ operationName: String) {

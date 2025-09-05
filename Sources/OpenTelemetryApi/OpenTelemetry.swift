@@ -13,9 +13,19 @@ import Foundation
 public final class OpenTelemetry: Sendable {
   public static let version = "v1.21.0"
   
-  /// Backward compatibility - deprecated global instance
-  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
-  public static let instance = OpenTelemetry()
+  /// Default context provider for SDK components that need context access
+  /// This provides a minimal singleton-like access without the full singleton pattern
+  public static let defaultContextProvider = OpenTelemetryContextProvider(
+    contextManager: {
+      #if canImport(os.activity)
+        return ActivityContextManager()
+      #elseif canImport(_Concurrency)
+        return TaskLocalContextManager()
+      #else
+        #error("No default ContextManager is supported on the target platform")
+      #endif
+    }()
+  )
   
   private let configuration: OpenTelemetryConfiguration
   
@@ -43,65 +53,6 @@ public final class OpenTelemetry: Sendable {
   public init(configuration: OpenTelemetryConfiguration = OpenTelemetryConfiguration()) {
     self.configuration = configuration
   }
-  
-  private init() {
-    self.configuration = OpenTelemetryConfiguration()
-  }
 
-  // MARK: - Deprecated static methods for backward compatibility
-  
-  @available(*, deprecated, renamed: "registerMeterProvider")
-  public static func registerStableMeterProvider(meterProvider: any MeterProvider) {
-    Self.registerMeterProvider(meterProvider: meterProvider)
-  }
 
-  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
-  public static func registerMeterProvider(meterProvider: any MeterProvider) {
-    // For backward compatibility, this would need to be implemented with a global mutable state
-    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
-  }
-
-  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")  
-  public static func registerTracerProvider(tracerProvider: TracerProvider) {
-    // For backward compatibility, this would need to be implemented with a global mutable state
-    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
-  }
-
-  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
-  public static func registerLoggerProvider(loggerProvider: LoggerProvider) {
-    // For backward compatibility, this would need to be implemented with a global mutable state
-    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
-  }
-
-  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
-  public static func registerBaggageManager(baggageManager: BaggageManager) {
-    // For backward compatibility, this would need to be implemented with a global mutable state
-    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
-  }
-
-  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
-  public static func registerPropagators(textPropagators: [TextMapPropagator],
-                                         baggagePropagator: TextMapBaggagePropagator) {
-    // For backward compatibility, this would need to be implemented with a global mutable state
-    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
-  }
-
-  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
-  public static func registerContextManager(contextManager: ContextManager) {
-    // For backward compatibility, this would need to be implemented with a global mutable state
-    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
-  }
-
-  @available(*, deprecated, message: "Create OpenTelemetry instance with configuration instead")
-  public static func registerFeedbackHandler(_ handler: @escaping @Sendable (String) -> Void) {
-    // For backward compatibility, this would need to be implemented with a global mutable state
-    // This is intentionally left as a placeholder since the goal is to migrate away from this pattern
-  }
-
-  /// A utility method for testing which sets the context manager for the duration of the closure, and then reverts it before the method returns
-  @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
-  static func withContextManager<T>(_ manager: ContextManager, _ operation: () throws -> T) rethrows -> T {
-    // This method is deprecated and should not be used in new code
-    return try operation()
-  }
 }

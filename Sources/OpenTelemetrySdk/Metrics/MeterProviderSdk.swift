@@ -6,12 +6,12 @@
 import Foundation
 import OpenTelemetryApi
 
-public class MeterProviderError: Error {}
+public final class MeterProviderError: Error, @unchecked Sendable {}
 
 @available(*, deprecated, renamed: "MeterProviderSdk")
 public typealias StableMeterProviderSdk = MeterProviderSdk
 
-public class MeterProviderSdk: MeterProvider {
+public final class MeterProviderSdk: MeterProvider, @unchecked Sendable {
   private static let defaultMeterName = "unknown"
   private let readerLock = Lock()
   var meterProviderSharedState: MeterProviderSharedState

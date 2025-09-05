@@ -12,8 +12,8 @@ import os.log
 #endif // os(iOS) && !targetEnvironment(macCatalyst)
 
 class URLSessionLogger {
+  static let runningSpansQueue = DispatchQueue(label: "io.opentelemetry.URLSessionLogger")
   static var runningSpans = [String: Span]()
-  static var runningSpansQueue = DispatchQueue(label: "io.opentelemetry.URLSessionLogger")
   #if os(iOS) && !targetEnvironment(macCatalyst)
 
     static var netstatInjector: NetworkStatusInjector? = { () -> NetworkStatusInjector? in
@@ -161,7 +161,7 @@ class URLSessionLogger {
 
     var instrumentedRequest = request
     objc_setAssociatedObject(instrumentedRequest, URLSessionInstrumentation.instrumentedKey, true, .OBJC_ASSOCIATION_COPY_NONATOMIC)
-    let propagators = OpenTelemetry.instance.propagators
+    let propagators = DefaultContextPropagators(textPropagators: [W3CTraceContextPropagator()], baggagePropagator: W3CBaggagePropagator())
 
     var traceHeaders = tracePropagationHTTPHeaders(span: span,
                                                    customBaggage: customBaggage,
@@ -184,14 +184,14 @@ class URLSessionLogger {
       }
     }
 
-    guard let currentSpan = span ?? OpenTelemetry.instance.contextProvider.activeSpan else {
+    guard let currentSpan = span ?? OpenTelemetry.defaultContextProvider.activeSpan else {
       return headers
     }
     textMapPropagator.inject(spanContext: currentSpan.context, carrier: &headers, setter: HeaderSetter())
 
-    let baggageBuilder = OpenTelemetry.instance.baggageManager.baggageBuilder()
+    let baggageBuilder = DefaultBaggageManager().baggageBuilder()
 
-    if let activeBaggage = OpenTelemetry.instance.contextProvider.activeBaggage {
+    if let activeBaggage = OpenTelemetry.defaultContextProvider.activeBaggage {
       activeBaggage.getEntries().forEach { baggageBuilder.put(key: $0.key, value: $0.value, metadata: $0.metadata) }
     }
 

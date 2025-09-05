@@ -24,7 +24,7 @@ public final class ZipkinBaggagePropagator: TextMapBaggagePropagator, @unchecked
   }
 
   public func extract(carrier: [String: String], getter: some Getter) -> Baggage? {
-    let builder = OpenTelemetry.instance.baggageManager.baggageBuilder()
+    let builder = DefaultBaggageManager().baggageBuilder()
 
     carrier.forEach {
       if $0.key.hasPrefix(ZipkinBaggagePropagator.baggagePrefix) {

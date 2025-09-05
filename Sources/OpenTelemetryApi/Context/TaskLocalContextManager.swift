@@ -16,9 +16,6 @@ import Foundation
   /// If you require dynamic context injection, you will need a custom context manager.
   @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
   public final class TaskLocalContextManager: ContextManager {
-    @available(*, deprecated, message: "Use instance-based approach with OpenTelemetryConfiguration")
-    package static let instance = TaskLocalContextManager()
-
     @TaskLocal static var context = [String: any Sendable]()
 
     public init() {}

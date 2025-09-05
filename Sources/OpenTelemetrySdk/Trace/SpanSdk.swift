@@ -307,7 +307,7 @@ public class SpanSdk: ReadableSpan {
     }
 
     endTime = time
-    OpenTelemetry.instance.contextProvider.removeContextForSpan(self)
+    OpenTelemetry.defaultContextProvider.removeContextForSpan(self)
     spanProcessor.onEnd(span: self)
   }
 

@@ -19,7 +19,8 @@ class PropagatedSpanBuilder: SpanBuilder {
 
   @discardableResult public func startSpan() -> Span {
     if spanContext == nil, !isRootSpan {
-      spanContext = OpenTelemetry.instance.contextProvider.activeSpan?.context
+      // Note: Without a global OpenTelemetry instance, parent span context must be explicitly set
+      // Users should set the parent span context using setParent() method
     }
     return PropagatedSpan(name: spanName,
                           context: spanContext ?? SpanContext.create(traceId: TraceId.random(),

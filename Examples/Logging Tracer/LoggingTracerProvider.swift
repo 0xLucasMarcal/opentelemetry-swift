@@ -6,7 +6,7 @@
 import Foundation
 import OpenTelemetryApi
 
-class LoggingTracerProvider: TracerProvider {
+final class LoggingTracerProvider: TracerProvider, @unchecked Sendable {
   func get(instrumentationName: String, instrumentationVersion: String?,
            schemaUrl: String? = nil,
            attributes: [String: AttributeValue]? = nil) -> any Tracer {

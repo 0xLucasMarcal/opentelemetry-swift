@@ -40,7 +40,7 @@ public struct URLSessionInstrumentationConfiguration {
     self.delegateClassesToInstrument = delegateClassesToInstrument
     self.baggageProvider = baggageProvider
     self.tracer = tracer ??
-      OpenTelemetry.instance.tracerProvider.get(instrumentationName: "NSURLSession", instrumentationVersion: "0.0.1")
+      DefaultTracerProvider().get(instrumentationName: "NSURLSession", instrumentationVersion: "0.0.1")
     self.ignoredClassPrefixes = ignoredClassPrefixes
   }
 

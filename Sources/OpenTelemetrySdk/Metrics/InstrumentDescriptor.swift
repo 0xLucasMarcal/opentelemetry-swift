@@ -5,7 +5,7 @@
 
 import Foundation
 
-public struct InstrumentDescriptor: Equatable {
+public struct InstrumentDescriptor: Equatable, Sendable {
   public let name: String
   public let description: String
   public let unit: String
